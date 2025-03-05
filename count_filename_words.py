@@ -26,9 +26,39 @@ def get_files(dir):
     
     return file_list
 
+# Count occurrences of each filename
+def count_occurrences(file_list):
+    return Counter(file_list)
+
+# Filter filenames occurring more than twice and sort in descending order
+def filter_and_sort(counts):
+    filtered = {name: count for name, count in counts.items() if count > 2}
+    return sorted(filtered.items(), key=lambda item: item[1], reverse=True)
+
+
 file_names = get_files(directory)
 if file_names:
     print(f"Found {len(file_names)} files.")
-    print(directory)
 else:
     print("No files found or invalid path.")
+
+file_counts = count_occurrences(file_names)
+
+sorted_files = filter_and_sort(file_counts)
+
+# Print results in a readable format
+if not sorted_files:
+    print("No filenames appear more than twice.")
+else:
+    print("\nFilename Occurrences (Descending Order)")
+    print("-" * 40)
+    for filename, count in sorted_files:
+        print(f"{filename}: {count}")
+
+'''
+if __name__ == "__main__":
+    file_names = get_files(directory)
+    file_counts = count_occurrences(file_names)
+    sorted_files = filter_and_sort(file_counts)
+    print(sorted_files)
+'''
