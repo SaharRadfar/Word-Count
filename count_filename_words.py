@@ -3,62 +3,44 @@
 import os
 from collections import Counter
 
-#Getting Directory Path as an input
-directory = input ("Please input /path/to/your/directory: ").strip()
-
-# Convert the path to an absolute path
-directory = os.path.abspath(directory)
-
-# Check if the path exists and is a directory
-if not os.path.exists(directory):
-    print("Error: The specified path does not exist.")
-
-if not os.path.isdir(directory):
-    print("Error: The specified path is not a directory.")
-
-
 # Recursively scans directories and collects file names in lowercase
 def get_files(dir):
     file_list = []
     for root, _, files in os.walk(dir):
+#        print(f'Checking folder: {root}')                                        # Debugging to see all folders checked
         for file in files:
-            file_list.append(file.lower())  # Convert to lowercase to be case-insensitive
+            base_name = os.path.splitext(file)[0].lower()                         # Remove extension and convert to lowercase, can be commented if file type is important
+            file_list.append(base_name)                                           # Convert to lowercase to be case-insensitive
     
     return file_list
 
-# Count occurrences of each filename
-def count_occurrences(file_list):
-    return Counter(file_list)
 
-# Filter filenames occurring more than twice and sort in descending order
-def filter_and_sort(counts):
-    filtered = {name: count for name, count in counts.items() if count > 2}
-    return sorted(filtered.items(), key=lambda item: item[1], reverse=True)
+directory = input ("Please input /path/to/your/directory: ").strip()               # Getting Directory Path as an input
+directory = os.path.abspath(directory)                                             # Convert the path to an absolute path
+file_names = get_files(directory)                                                  # Call Recursively scans function
+file_counts = Counter(file_names)                                                  # Count occurrences of each filename
+filtered = {name: count for name, count in file_counts.items() if count > 2}       # Filter filenames occurring more than twice
+sorted_files = sorted(filtered.items(), key=lambda item: item[1], reverse=True)    # Sort filenames occurring in descending order
 
-
-file_names = get_files(directory)
-if file_names:
-    print(f"Found {len(file_names)} files.")
-else:
-    print("No files found or invalid path.")
-
-file_counts = count_occurrences(file_names)
-
-sorted_files = filter_and_sort(file_counts)
 
 # Print results in a readable format
-if not sorted_files:
+if not os.path.exists(directory):                                                  # Check if the path exists
+    print("Error: The specified path does not exist.")
+    exit(1)
+    
+if not os.path.isdir(directory):                                                  # Check if the path is a directory
+    print("Error: The specified path is not a directory.")
+    exit(1)
+
+if not file_names:                                                                # Check if no files found
+    print("No files found")
+    exit(1)
+
+if not sorted_files:                                                              # Check if no files appear more than twice
     print("No filenames appear more than twice.")
-else:
+
+else:                                                                             # Print results
     print("\nFilename Occurrences (Descending Order)")
     print("-" * 40)
     for filename, count in sorted_files:
         print(f"{filename}: {count}")
-
-'''
-if __name__ == "__main__":
-    file_names = get_files(directory)
-    file_counts = count_occurrences(file_names)
-    sorted_files = filter_and_sort(file_counts)
-    print(sorted_files)
-'''
